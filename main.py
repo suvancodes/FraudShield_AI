@@ -5,6 +5,11 @@ from src.exception.exciption import CustomException
 import sys
 from src.logger.logging import logging
 from src.entity.artifact_entity import DataIngestionArtifact
+from src.entity.artifact_entity import DataValidationArtifact
+from src.components.data_transformation import DataTransformation
+from src.entity.config_entity import DataTransformationConfig
+from src.entity.artifact_entity import DataTransformationArtifact
+from src.utils.ml_utils.text_preprocessor_utils import TextPreprocessorUtils
 
 if __name__ == "__main__":
     try:
@@ -18,6 +23,11 @@ if __name__ == "__main__":
         data_validation_artifact = data_validation.initiate_data_validation()
         logging.info(f"Data Validation artifact: {data_validation_artifact}")
         print(data_validation_artifact)
+        data_transformation_config = DataTransformationConfig()
+        data_transformation = DataTransformation(data_transformation_config=data_transformation_config)
+        data_transformation_artifact = data_transformation.initiate_data_transformation(data_ingestion_artifact=data_ingestion_artifact)
+        logging.info(f"Data Transformation artifact: {data_transformation_artifact}")
+        print(data_transformation_artifact)
     except Exception as e:
         raise CustomException(e, sys)
 

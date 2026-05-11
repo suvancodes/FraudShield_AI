@@ -54,6 +54,8 @@ class DataTransformationConfig:
             self.transformed_data_dir = os.path.join(self.data_transformation_dir, traning_pipeline.DATA_TRANSFORMATION_TRANSFORMED_DIR)
             self.transformed_train_file_name = os.path.join(self.transformed_data_dir, traning_pipeline.TRANING_FILE_NAME)
             self.transformed_test_file_name = os.path.join(self.transformed_data_dir, traning_pipeline.TEST_FILE_NAME)
+            self.wordtovector_dir = os.path.join(self.data_transformation_dir, traning_pipeline.DATA_TRANSFORMATION_WORDTOVECTOR_DIR)
+            self.wordtovector_object_file_name = os.path.join(self.wordtovector_dir, traning_pipeline.DATA_TRANSFORMATION_WORDTOVECTOR_OBJECT_FILE_NAME)
         except Exception as e:
             raise CustomException(e, sys)
         
