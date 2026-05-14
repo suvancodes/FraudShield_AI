@@ -27,7 +27,7 @@ class DataValidation:
             os.makedirs(self.data_validation_config.validated_dir, exist_ok=True)
 
             # save validated train and test data in validated dir
-            validated_train_file_path = os.path.join(self.data_validation_config.validated_dir, traning_pipeline.TRANING_FILE_NAME)
+            validated_train_file_path = os.path.join(self.data_validation_config.validated_dir, traning_pipeline.TRAINING_FILE_NAME)
             validated_test_file_path = os.path.join(self.data_validation_config.validated_dir, traning_pipeline.TEST_FILE_NAME)
             train_df.to_csv(validated_train_file_path, index=False)
             test_df.to_csv(validated_test_file_path, index=False)

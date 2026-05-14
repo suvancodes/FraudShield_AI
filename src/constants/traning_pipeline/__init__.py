@@ -16,11 +16,11 @@ DATA_INGESTION_TRAIN_TEST_SPLIT_RATION: float = 0.2
 DEFINING COMMON CONSTANTS FOR TRAINING PIPELINE
 """
 
-TERGET_COLUMN: str = "Class"
+TARGET_COLUMN: str = "label"
 PIPELINE_NAME: str = "src"
 ARTIFACT_DIR: str = "artifacts"
 FILE_NAME: str = "SMSSpamCollection"
-TRANING_FILE_NAME: str = "train"
+TRAINING_FILE_NAME: str = "train"
 TEST_FILE_NAME: str = "test"
 
 # SAVE_MODEL_DIR:str = os.path.join("saved_models")
