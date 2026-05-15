@@ -12,6 +12,7 @@ from src.entity.artifact_entity import DataTransformationArtifact
 from src.entity.config_entity import DataTransformationConfig
 from src.utils.ml_utils.text_preprocessor_utils import TextPreprocessorUtils
 from src.utils.ml_utils.word2vec_utils import Word2VecUtils
+from src.utils.main_utils.utils import save_object
 
 class DataTransformation:
     def __init__(self, data_transformation_config: DataTransformationConfig):
@@ -81,6 +82,18 @@ class DataTransformation:
             train_df.to_csv(self.data_transformation_config.transformed_train_file_name, index=False)
             test_df.to_csv(self.data_transformation_config.transformed_test_file_name, index=False)
             logging.info("Data Transformation completed")
+            logging.info("Saving preprocessing object...")
+            
+            os.makedirs(os.path.dirname(self.data_transformation_config.preprocessing_object_file_name), exist_ok=True)
+            save_object(self.data_transformation_config.preprocessing_object_file_name, text_preprocessor_utils)
+            logging.info("Preprocessing object saved successfully")
+
+            logging.info("Saving word2vec object...")
+            os.makedirs(os.path.dirname(self.data_transformation_config.wordtovector_object_file_name), exist_ok=True)
+            save_object(self.data_transformation_config.wordtovector_object_file_name, word2vec_utils)
+            logging.info("Word2Vec object saved successfully")
+            logging.info("Data Transformation artifact creation started")
+            
             # create data transformation artifact
             data_transformation_artifact = DataTransformationArtifact(
                 transformed_train_file_path=self.data_transformation_config.transformed_train_file_name,
