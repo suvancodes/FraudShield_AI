@@ -60,7 +60,7 @@ class DataTransformationConfig:
             raise CustomException(e, sys)
         
         
-class model_trainer_config:
+class ModelTrainerConfig:
     def __init__(self):
         try:
             logging.info("Model Trainer configuartion started") 

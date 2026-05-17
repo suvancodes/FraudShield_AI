@@ -10,7 +10,11 @@ from src.components.data_transformation import DataTransformation
 from src.entity.config_entity import DataTransformationConfig
 from src.entity.artifact_entity import DataTransformationArtifact
 from src.utils.ml_utils.text_preprocessor_utils import TextPreprocessorUtils
-
+from src.utils.ml_utils.word2vec_utils import Word2VecUtils
+from src.utils.main_utils.utils import save_object
+from src.components.model_trainer import ModelTrainer
+from src.entity.config_entity import ModelTrainerConfig
+from src.entity.artifact_entity import ModelTrainerArtifact
 if __name__ == "__main__":
     try:
         data_ingestion_config = DataIngestionConfig()
@@ -28,6 +32,12 @@ if __name__ == "__main__":
         data_transformation_artifact = data_transformation.initiate_data_transformation(data_ingestion_artifact=data_ingestion_artifact)
         logging.info(f"Data Transformation artifact: {data_transformation_artifact}")
         print(data_transformation_artifact)
+        model_trainer_config = ModelTrainerConfig()
+        model_trainer = ModelTrainer(data_transformation_config=data_transformation_config,model_trainer_config=model_trainer_config)
+        model_trainer_artifact = model_trainer.initiate_model_trainer(data_transformation_artifact=data_transformation_artifact)
+        logging.info(f"Model Trainer artifact: {model_trainer_artifact}")
+        print(model_trainer_artifact)
+        
     except Exception as e:
         raise CustomException(e, sys)
 
