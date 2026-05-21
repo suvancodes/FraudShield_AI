@@ -86,11 +86,13 @@ class DataTransformation:
             
             os.makedirs(os.path.dirname(self.data_transformation_config.preprocessing_object_file_name), exist_ok=True)
             save_object(self.data_transformation_config.preprocessing_object_file_name, text_preprocessor_utils)
+            save_object(file_path="preprocessor/text_preprocessor_utils.pkl", obj=text_preprocessor_utils)
             logging.info("Preprocessing object saved successfully")
 
             logging.info("Saving word2vec object...")
             os.makedirs(os.path.dirname(self.data_transformation_config.wordtovector_object_file_name), exist_ok=True)
             save_object(self.data_transformation_config.wordtovector_object_file_name, word2vec_utils)
+            save_object(file_path="preprocessor/word2vec_utils.pkl", obj=word2vec_utils)
             logging.info("Word2Vec object saved successfully")
             logging.info("Data Transformation artifact creation started")
             

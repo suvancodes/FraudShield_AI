@@ -43,12 +43,12 @@ class ModelTrainer:
             y_test = test_df[traning_pipeline.TARGET_COLUMN]
             
             models = {
-                "Logistic Regression": LogisticRegression(),
+                # "Logistic Regression": LogisticRegression(),
                 "Random Forest": RandomForestClassifier(),
-                "Gradient Boosting": GradientBoostingClassifier(),
-                "AdaBoost": AdaBoostClassifier(),
-                "Decision Tree": DecisionTreeClassifier(),
-                "K-Nearest Neighbors": KNeighborsClassifier()
+                # "Gradient Boosting": GradientBoostingClassifier(),
+                # "AdaBoost": AdaBoostClassifier(),
+                # "Decision Tree": DecisionTreeClassifier(),
+                # "K-Nearest Neighbors": KNeighborsClassifier()
             }
             best_model_name = None
             best_model = None
@@ -81,8 +81,9 @@ class ModelTrainer:
                     best_model = model
                     
             print(f"Best model: {best_model_name} with f1 score: {best_model_score}")
-            # save_object(file_path=self.model_trainer_config.trained_model_file_name, obj=best_model)
-           
+            save_object(file_path=self.model_trainer_config.trained_model_file_name, obj=best_model)
+
+            save_object(file_path="saved_models/best_model.pkl", obj=best_model)
             logging.info("Model training started")
         except Exception as e:
             raise CustomException(e, sys)
