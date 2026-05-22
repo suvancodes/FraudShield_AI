@@ -13,3 +13,5 @@ nltk
 tqdm
 gensim
 dill
+scipy 
+pyyaml
