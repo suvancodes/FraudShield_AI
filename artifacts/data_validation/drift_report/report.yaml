@@ -1,0 +1,136 @@
+generated_at: '2026-06-01T15:01:45.074570+00:00'
+schema_validation:
+  train_shape:
+  - 1195
+  - 2
+  test_shape:
+  - 299
+  - 2
+  missing_in_test: []
+  extra_in_test: []
+  dtype_mismatches: {}
+  is_valid: true
+drift_detection:
+  scipy_available: true
+  decision_rule: p_value (KS/Chi2) if scipy is available else PSI
+  p_value_alpha: 0.05
+  psi_threshold: 0.2
+  n_features_checked: 1
+  n_drifted_features: 0
+  drifted_features: []
+  features:
+    message:
+      feature_type: categorical
+      dtype:
+        train: object
+        test: object
+      tests:
+        chi2:
+          enabled: true
+          statistic: 31.8987849117955
+          p_value: 0.9784026090944417
+          alpha: 0.05
+        psi:
+          value: 0.562813827892371
+          threshold: 0.2
+          max_categories: 50
+      drifted: false
+      drifted_by: p_value
+      drifted_by_p_value: false
+      drifted_by_psi: true
+      train_summary:
+        count: 1195
+        missing_rate: 0.0
+        n_unique: 1104
+        top_values:
+        - value: Sorry, I'll call later
+          count: 7
+          pct: 0.005857740585774059
+        - value: I cant pick the phone right now. Pls send a message
+          count: 4
+          pct: 0.0033472803347280333
+        - value: "Please call our customer service representative on FREEPHONE 0808\
+            \ 145 4742 between 9am-11pm as you have WON a guaranteed \xC2\xA31000\
+            \ cash or \xC2\xA35000 prize!"
+          count: 3
+          pct: 0.002510460251046025
+        - value: FREE for 1st week! No1 Nokia tone 4 ur mob every week just txt NOKIA
+            to 8007 Get txting and tell ur mates www.getzed.co.uk POBox 36504 W45WQ
+            norm150p/tone 16+
+          count: 3
+          pct: 0.002510460251046025
+        - value: You have won a Nokia 7250i. This is what you get when you win our
+            FREE auction. To take part send Nokia to 86021 now. HG/Suite342/2Lands
+            Row/W1JHL 16+
+          count: 3
+          pct: 0.002510460251046025
+        - value: Camera - You are awarded a SiPix Digital Camera! call 09061221066
+            fromm landline. Delivery within 28 days.
+          count: 3
+          pct: 0.002510460251046025
+        - value: Ok.
+          count: 3
+          pct: 0.002510460251046025
+        - value: Wan2 win a Meet+Greet with Westlife 4 U or a m8? They are currently
+            on what tour? 1)Unbreakable, 2)Untamed, 3)Unkempt. Text 1,2 or 3 to 83049.
+            Cost 50p +std text
+          count: 2
+          pct: 0.0016736401673640166
+        - value: "Last Chance! Claim ur \xC2\xA3150 worth of discount vouchers today!\
+            \ Text SHOP to 85023 now! SavaMob, offers mobile! T Cs SavaMob POBOX84,\
+            \ M263UZ. \xC2\xA33.00 Sub. 16"
+          count: 2
+          pct: 0.0016736401673640166
+        - value: Buy Space Invaders 4 a chance 2 win orig Arcade Game console. Press
+            0 for Games Arcade (std WAP charge) See o2.co.uk/games 4 Terms + settings.
+            No purchase
+          count: 2
+          pct: 0.0016736401673640166
+      test_summary:
+        count: 299
+        missing_rate: 0.0
+        n_unique: 291
+        top_values:
+        - value: SIX chances to win CASH! From 100 to 20,000 pounds txt> CSH11 and
+            send to 87575. Cost 150p/day, 6days, 16+ TsandCs apply Reply HL 4 info
+          count: 2
+          pct: 0.006688963210702341
+        - value: Wen ur lovable bcums angry wid u, dnt take it seriously.. Coz being
+            angry is d most childish n true way of showing deep affection, care n
+            luv!.. kettoda manda... Have nice day da.
+          count: 2
+          pct: 0.006688963210702341
+        - value: Spook up your mob with a Halloween collection of a logo & pic message
+            plus a free eerie tone, txt CARD SPOOK to 8007 zed 08701417012150p per
+            logo/pic
+          count: 2
+          pct: 0.006688963210702341
+        - value: Ok...
+          count: 2
+          pct: 0.006688963210702341
+        - value: U have a secret admirer who is looking 2 make contact with U-find
+            out who they R*reveal who thinks UR so special-call on 09058094599
+          count: 2
+          pct: 0.006688963210702341
+        - value: I don't know u and u don't know me. Send CHAT to 86688 now and let's
+            find each other! Only 150p/Msg rcvd. HG/Suite342/2Lands/Row/W1J6HL LDN.
+            18 years or over.
+          count: 2
+          pct: 0.006688963210702341
+        - value: "Hi 07734396839 IBH Customer Loyalty Offer: The NEW NOKIA6600 Mobile\
+            \ from ONLY \xC2\xA310 at TXTAUCTION!Txt word:START to No:81151 & get\
+            \ Yours Now!4T&"
+          count: 2
+          pct: 0.006688963210702341
+        - value: "YOU VE WON! Your 4* Costa Del Sol Holiday or \xC2\xA35000 await\
+            \ collection. Call 09050090044 Now toClaim. SAE, TC s, POBox334, Stockport,\
+            \ SK38xh, Cost\xC2\xA31.50/pm, Max10mins"
+          count: 2
+          pct: 0.006688963210702341
+        - value: Oh yeah clearly it's my fault
+          count: 1
+          pct: 0.0033444816053511705
+        - value: "FREE entry into our \xC2\xA3250 weekly competition just text the\
+            \ word WIN to 80086 NOW. 18 T&C www.txttowin.co.uk"
+          count: 1
+          pct: 0.0033444816053511705
