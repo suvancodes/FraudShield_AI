@@ -13,8 +13,11 @@ from src.entity.config_entity import DataTransformationConfig
 
 # Download stopwords if not already present
 try:
+    # This line will raise a LookupError if 'stopwords' is not found
     nltk.data.find('corpora/stopwords')
-except nltk.downloader.DownloadError:
+except LookupError:
+    # FIX: Catch the correct exception (LookupError) and download the resource
+    logging.info("Stopwords not found. Downloading...")
     nltk.download('stopwords')
 
 class TextPreprocessorUtils:
