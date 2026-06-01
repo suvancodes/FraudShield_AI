@@ -9,8 +9,6 @@ An end-to-end machine learning project that builds and deploys a robust system t
 
 [**Live Demo**](https://fraudshield-suvankar.streamlit.app/)
 
-![Live Application Demo](https://fraudshield-suvankar.streamlit.app/) <!-- Placeholder: Replace with a real screenshot of your working app -->
-
 ---
 
 ## Table of Contents
