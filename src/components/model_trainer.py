@@ -6,11 +6,8 @@ from src.constants import traning_pipeline
 from src.entity.config_entity import DataIngestionConfig,ModelTrainerConfig
 from src.logger.logging import logging
 from src.exception.exciption import CustomException
-from src.entity.artifact_entity import DataIngestionArtifact, ModelTrainerArtifact, ModelTrainerArtifact,ClassificationMatrixArtifact
-from src.entity.artifact_entity import DataTransformationArtifact
+from src.entity.artifact_entity import DataIngestionArtifact, ModelTrainerArtifact, DataTransformationArtifact
 from src.entity.config_entity import DataTransformationConfig
-from src.utils.ml_utils.text_preprocessor_utils import TextPreprocessorUtils
-from src.utils.ml_utils.word2vec_utils import Word2VecUtils
 from src.utils.main_utils.utils import save_object
 
 from sklearn.linear_model import LogisticRegression
@@ -30,17 +27,16 @@ class ModelTrainer:
         try:
             logging.info("Model Trainer started")
             logging.info("Reading transformed train and test data")
-            # read transformed train and test data
-            train_df = pd.read_csv(data_transformation_artifact.transformed_train_file_path)
-            test_df = pd.read_csv(data_transformation_artifact.transformed_test_file_path)
-
-            logging.info("Data read from source completed")
             
+            # Load numpy arrays
+            train_arr = np.load(data_transformation_artifact.transformed_train_file_path)
+            test_arr = np.load(data_transformation_artifact.transformed_test_file_path)
+
             # split features and target variable from train and test data
-            X_train = train_df.drop(traning_pipeline.TARGET_COLUMN, axis=1)
-            y_train = train_df[traning_pipeline.TARGET_COLUMN]
-            X_test = test_df.drop(traning_pipeline.TARGET_COLUMN, axis=1)
-            y_test = test_df[traning_pipeline.TARGET_COLUMN]
+            X_train, y_train = train_arr[:, :-1], train_arr[:, -1]
+            X_test, y_test = test_arr[:, :-1], test_arr[:, -1]
+            
+            logging.info("Data loaded and split successfully.")
             
             models = {
                 "Logistic Regression": LogisticRegression(),
@@ -81,9 +77,23 @@ class ModelTrainer:
                     best_model = model
                     
             print(f"Best model: {best_model_name} with f1 score: {best_model_score}")
-            save_object(file_path=self.model_trainer_config.trained_model_file_name, obj=best_model)
+            logging.info(f"Best model found: {best_model_name} with f1 score: {best_model_score}")
+            
+            if best_model_score < self.model_trainer_config.expected_score:
+                raise Exception("No best model found with expected accuracy")
 
-            save_object(file_path="saved_models/best_model.pkl", obj=best_model)
-            logging.info("Model training started")
+            logging.info("Saving the best model")
+            # FIX: Use the correct attribute name 'trained_model_file_path'
+            save_object(file_path=self.model_trainer_config.trained_model_file_path, obj=best_model)
+
+            # create model trainer artifact
+            model_trainer_artifact = ModelTrainerArtifact(
+                trained_model_file_path=self.model_trainer_config.trained_model_file_path,
+                best_model_name=best_model_name,
+                best_model_score=best_model_score
+            )
+            
+            return model_trainer_artifact
+            
         except Exception as e:
             raise CustomException(e, sys)

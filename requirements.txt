@@ -15,3 +15,4 @@ gensim
 dill
 scipy 
 pyyaml
+streamlit

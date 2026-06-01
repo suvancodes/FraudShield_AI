@@ -1,11 +1,13 @@
 import numpy as np
 import pandas as pd
 import os
+from dataclasses import dataclass, field
 from src.constants import traning_pipeline
 import sys
 from src.logger.logging import logging
 from src.exception.exciption import CustomException
 
+@dataclass
 class DataIngestionConfig:
     def __init__(self):
         try:
@@ -25,6 +27,7 @@ class DataIngestionConfig:
         except Exception as e:
             raise CustomException(e, sys)
         
+@dataclass
 class DataValidationConfig:
     def __init__(self):
         try:
@@ -41,35 +44,63 @@ class DataValidationConfig:
             raise CustomException(e, sys)
         
         
+@dataclass
 class DataTransformationConfig:
-    def __init__(self):
-        try:
-            logging.info("Data Transformation configuartion started") 
-            self.artifact_dir = traning_pipeline.ARTIFACT_DIR
-            self.data_transformation_dir = os.path.join(self.artifact_dir, traning_pipeline.DATA_TRANSFORMATION_DIR_NAME)
-            self.transformed_dir = os.path.join(self.data_transformation_dir, traning_pipeline.DATA_TRANSFORMATION_TRANSFORMED_DIR)
-            self.transformation_object_dir = os.path.join(self.data_transformation_dir, traning_pipeline.DATA_TRANSFORMATION_OBJECT_DIR)
-            self.preprocessing_dir = os.path.join(self.data_transformation_dir, traning_pipeline.DATA_TRANSFORMATION_PREPROCESSING_DIR)
-            self.preprocessing_object_file_name = os.path.join(self.preprocessing_dir, traning_pipeline.DATA_TRANSFORMATION_PREPROCESSING_OBJECT_FILE_NAME)
-            self.transformed_data_dir = os.path.join(self.data_transformation_dir, traning_pipeline.DATA_TRANSFORMATION_TRANSFORMED_DIR)
-            self.transformed_train_file_name = os.path.join(self.transformed_data_dir, traning_pipeline.TRAINING_FILE_NAME)
-            self.transformed_test_file_name = os.path.join(self.transformed_data_dir, traning_pipeline.TEST_FILE_NAME)
-            self.wordtovector_dir = os.path.join(self.data_transformation_dir, traning_pipeline.DATA_TRANSFORMATION_WORDTOVECTOR_DIR)
-            self.wordtovector_object_file_name = os.path.join(self.wordtovector_dir, traning_pipeline.DATA_TRANSFORMATION_WORDTOVECTOR_OBJECT_FILE_NAME)
-        except Exception as e:
-            raise CustomException(e, sys)
-        
-        
+    # This class now directly defines its paths using constants
+    # It no longer needs a custom __init__ method
+    
+    transformed_dir: str = os.path.join(traning_pipeline.ARTIFACT_DIR, traning_pipeline.DATA_TRANSFORMATION_DIR_NAME, traning_pipeline.DATA_TRANSFORMATION_TRANSFORMED_DIR)
+    
+    transformed_train_file_name: str = os.path.join(transformed_dir, traning_pipeline.TRANSFORMED_TRAIN_FILE_NAME)
+    
+    transformed_test_file_name: str = os.path.join(transformed_dir, traning_pipeline.TRANSFORMED_TEST_FILE_NAME)
+    
+    preprocessing_object_file_name: str = os.path.join(
+        traning_pipeline.ARTIFACT_DIR, 
+        traning_pipeline.DATA_TRANSFORMATION_DIR_NAME, 
+        traning_pipeline.DATA_TRANSFORMATION_PREPROCESSING_DIR, 
+        traning_pipeline.DATA_TRANSFORMATION_PREPROCESSING_OBJECT_FILE_NAME
+    )
+    
+    wordtovector_object_file_name: str = os.path.join(
+        traning_pipeline.ARTIFACT_DIR, 
+        traning_pipeline.DATA_TRANSFORMATION_DIR_NAME, 
+        traning_pipeline.DATA_TRANSFORMATION_WORDTOVECTOR_DIR, 
+        traning_pipeline.DATA_TRANSFORMATION_WORDTOVECTOR_OBJECT_FILE_NAME
+    )
+    
+    # Add the Word2Vec hyperparameters
+    word2vec_vector_size: int = traning_pipeline.WORD2VEC_VECTOR_SIZE
+    word2vec_window: int = traning_pipeline.WORD2VEC_WINDOW
+    word2vec_min_count: int = traning_pipeline.WORD2VEC_MIN_COUNT
+
+
+@dataclass
 class ModelTrainerConfig:
-    def __init__(self):
-        try:
-            logging.info("Model Trainer configuartion started") 
-            self.artifact_dir = traning_pipeline.ARTIFACT_DIR
-            self.trained_model_dir = os.path.join(self.artifact_dir, traning_pipeline.MODEL_TRAINER_TRAINED_MODEL_DIR)
-            self.trained_model_file_name = os.path.join(self.trained_model_dir, traning_pipeline.MODEL_FILE_NAME)
-            self.expected_score = traning_pipeline.MODEL_TRAINER_EXPECTED_SCORE
-            self.overfitting_underfitting_threshold = traning_pipeline.MODEL_TRAINER_OVERFITTING_UNDERFITTING_THRESHOLD
-            
-            logging.info("Model Trainer configuartion completed")
-        except Exception as e:
-            raise CustomException(e, sys)
+    # This class now directly defines its paths using constants
+    
+    trained_model_dir: str = os.path.join(
+        traning_pipeline.ARTIFACT_DIR, 
+        traning_pipeline.MODEL_TRAINER_DIR_NAME, 
+        traning_pipeline.MODEL_TRAINER_TRAINED_MODEL_DIR
+    )
+
+    trained_model_file_path: str = os.path.join(
+        trained_model_dir, 
+        traning_pipeline.MODEL_FILE_NAME
+    )
+
+    expected_score: float = traning_pipeline.MODEL_TRAINER_EXPECTED_SCORE
+    
+    overfitting_underfitting_threshold: float = traning_pipeline.MODEL_TRAINER_OVERFITTING_UNDERFITTING_THRESHOLD
+
+
+@dataclass
+class ModelEvaluationConfig:
+    # ... (assuming this class exists or will be added later)
+    pass
+
+@dataclass
+class ModelPusherConfig:
+    # ... (assuming this class exists or will be added later)
+    pass

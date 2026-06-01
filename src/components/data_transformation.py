@@ -4,11 +4,9 @@ import numpy as np
 import os
 import sys
 from src.constants import traning_pipeline
-from src.entity.config_entity import DataIngestionConfig
 from src.logger.logging import logging
 from src.exception.exciption import CustomException
-from src.entity.artifact_entity import DataIngestionArtifact
-from src.entity.artifact_entity import DataTransformationArtifact
+from src.entity.artifact_entity import DataIngestionArtifact, DataTransformationArtifact
 from src.entity.config_entity import DataTransformationConfig
 from src.utils.ml_utils.text_preprocessor_utils import TextPreprocessorUtils
 from src.utils.ml_utils.word2vec_utils import Word2VecUtils
@@ -18,85 +16,61 @@ class DataTransformation:
     def __init__(self, data_transformation_config: DataTransformationConfig):
         self.data_transformation_config = data_transformation_config
         
-    def apply_smote(self, input_df: pd.DataFrame, target_series: pd.Series) -> tuple:
-        smote = SMOTE(random_state=42)
-        X_resampled, y_resampled = smote.fit_resample(input_df, target_series)
-        print("After SMOTE, the shape of X: ", X_resampled.shape)
-        print("After SMOTE, the shape of y: ", y_resampled.shape)
-        print("After SMOTE, the distribution of target variable: ", np.bincount(y_resampled))
-        logging.info("SMOTE applied successfully")
-        logging.info(f"After SMOTE, the shape of X: {X_resampled.shape}")
-        logging.info(f"After SMOTE, the shape of y: {y_resampled.shape}")
-        logging.info(f"After SMOTE, the distribution of target variable: {np.bincount(y_resampled)}")
-        return X_resampled, y_resampled
-
     def initiate_data_transformation(self, data_ingestion_artifact: DataIngestionArtifact) -> DataTransformationArtifact:
         try:
             logging.info("Data Transformation started")
-            logging.info("Reading train and test data")
-            # read train and test data
             train_df = pd.read_csv(data_ingestion_artifact.train_file_path)
             test_df = pd.read_csv(data_ingestion_artifact.test_file_path)
+            logging.info("Read train and test data completed.")
 
-            all_df = pd.concat([train_df, test_df], axis=0)
-            logging.info("Data read from source completed")
-            
-            logging.info("Preprocessing text data...")
-            
-            text_preprocessor_utils = TextPreprocessorUtils(self.data_transformation_config)
-            train_df, test_df, all_df = text_preprocessor_utils.preprocess_text(train_df, test_df, all_df)
-            logging.info("Text preprocessing completed")
-            
-            logging.info("Applying word2vec...")
+            # Initialize preprocessor and word2vec utilities
+            # FIX: TextPreprocessorUtils no longer takes a config argument
+            text_preprocessor_utils = TextPreprocessorUtils()
             word2vec_utils = Word2VecUtils(self.data_transformation_config)
-            train_df, test_df = word2vec_utils.word2vec(train_df, test_df, all_df)
-            logging.info("Word2Vec transformation completed")
-            
-            logging.info("Applying SMOTE to handle class imbalance...")
-            logging.info(f"Before SMOTE, the shape of train data: {train_df.shape}")
-            logging.info(f"Before SMOTE, the distribution of target variable: {train_df[traning_pipeline.TARGET_COLUMN].value_counts()}")
-            
-            
-            # apply smote on train data
-            X_train = train_df.drop(columns=[traning_pipeline.TARGET_COLUMN])
-            y_train = train_df[traning_pipeline.TARGET_COLUMN]
-            X_train_resampled, y_train_resampled = self.apply_smote(X_train, y_train)
-            train_df = pd.concat([pd.DataFrame(X_train_resampled, columns=X_train.columns), pd.DataFrame(y_train_resampled, columns=[traning_pipeline.TARGET_COLUMN])], axis=1)
-            logging.info(f"After SMOTE, the shape of train data: {train_df.shape}")
-            logging.info(f"After SMOTE, the distribution of target variable: {train_df[traning_pipeline.TARGET_COLUMN].value_counts()}")
-            
-            # apply smote on test data
-            logging.info(f"Before SMOTE, the shape of test data: {test_df.shape}")
-            logging.info(f"Before SMOTE, the distribution of target variable: {test_df[traning_pipeline.TARGET_COLUMN].value_counts()}")
-            X_test = test_df.drop(columns=[traning_pipeline.TARGET_COLUMN])
-            y_test = test_df[traning_pipeline.TARGET_COLUMN]
-            X_test_resampled, y_test_resampled = self.apply_smote(X_test, y_test)
-            test_df = pd.concat([pd.DataFrame(X_test_resampled, columns=X_test.columns), pd.DataFrame(y_test_resampled, columns=[traning_pipeline.TARGET_COLUMN])], axis=1)
-            logging.info(f"After SMOTE, the shape of test data: {test_df.shape}")
-            logging.info(f"After SMOTE, the distribution of target variable: {test_df[traning_pipeline.TARGET_COLUMN].value_counts()}")
 
-            # create transformed dir
-            os.makedirs(self.data_transformation_config.transformed_dir, exist_ok=True)
+            # Preprocess text
+            train_df['processed_message'] = train_df['message'].apply(text_preprocessor_utils.preprocess_text)
+            test_df['processed_message'] = test_df['message'].apply(text_preprocessor_utils.preprocess_text)
+            logging.info("Text preprocessing completed.")
 
-            # save transformed train and test data
-            train_df.to_csv(self.data_transformation_config.transformed_train_file_name, index=False)
-            test_df.to_csv(self.data_transformation_config.transformed_test_file_name, index=False)
-            logging.info("Data Transformation completed")
-            logging.info("Saving preprocessing object...")
+            # Train Word2Vec model ONLY on training data to prevent leakage
+            logging.info("Training Word2Vec model on training data...")
+            w2v_model = word2vec_utils.train_word2vec_model(train_df['processed_message'])
+            logging.info("Word2Vec model training completed.")
+
+            # Vectorize train and test data using the trained model
+            X_train = word2vec_utils.vectorize_data(train_df['processed_message'], w2v_model)
+            X_test = word2vec_utils.vectorize_data(test_df['processed_message'], w2v_model)
+            y_train = train_df[traning_pipeline.TARGET_COLUMN].map({'ham': 0, 'spam': 1})
+            y_test = test_df[traning_pipeline.TARGET_COLUMN].map({'ham': 0, 'spam': 1})
+            logging.info("Text vectorization completed.")
+
+            # Apply SMOTE to the training data
+            logging.info(f"Before SMOTE, train distribution: {y_train.value_counts().to_dict()}")
+            smote = SMOTE(random_state=42)
+            X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
+            logging.info(f"After SMOTE, train distribution: {pd.Series(y_train_resampled).value_counts().to_dict()}")
+
+            # Combine features and target into final arrays for training
+            train_arr = np.c_[X_train_resampled, np.array(y_train_resampled)]
+            test_arr = np.c_[X_test, np.array(y_test)]
+
+            # Save the actual trained Word2Vec model
+            os.makedirs(os.path.dirname(self.data_transformation_config.wordtovector_object_file_name), exist_ok=True)
+            save_object(self.data_transformation_config.wordtovector_object_file_name, w2v_model)
+            logging.info(f"Word2Vec model object saved at: {self.data_transformation_config.wordtovector_object_file_name}")
             
+            # Save the text preprocessor utility (this one is stateless, so saving the class is okay)
             os.makedirs(os.path.dirname(self.data_transformation_config.preprocessing_object_file_name), exist_ok=True)
             save_object(self.data_transformation_config.preprocessing_object_file_name, text_preprocessor_utils)
-            save_object(file_path="preprocessor/text_preprocessor_utils.pkl", obj=text_preprocessor_utils)
-            logging.info("Preprocessing object saved successfully")
+            logging.info(f"Text preprocessor object saved at: {self.data_transformation_config.preprocessing_object_file_name}")
 
-            logging.info("Saving word2vec object...")
-            os.makedirs(os.path.dirname(self.data_transformation_config.wordtovector_object_file_name), exist_ok=True)
-            save_object(self.data_transformation_config.wordtovector_object_file_name, word2vec_utils)
-            save_object(file_path="preprocessor/word2vec_utils.pkl", obj=word2vec_utils)
-            logging.info("Word2Vec object saved successfully")
-            logging.info("Data Transformation artifact creation started")
-            
-            # create data transformation artifact
+            # Save transformed data as numpy arrays
+            os.makedirs(self.data_transformation_config.transformed_dir, exist_ok=True)
+            np.save(self.data_transformation_config.transformed_train_file_name, train_arr)
+            np.save(self.data_transformation_config.transformed_test_file_name, test_arr)
+            logging.info("Saved transformed train and test arrays.")
+
             data_transformation_artifact = DataTransformationArtifact(
                 transformed_train_file_path=self.data_transformation_config.transformed_train_file_name,
                 transformed_test_file_path=self.data_transformation_config.transformed_test_file_name,
