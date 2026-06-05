@@ -10,6 +10,8 @@ from src.entity.artifact_entity import DataIngestionArtifact, ModelTrainerArtifa
 from src.entity.config_entity import DataTransformationConfig
 from src.utils.main_utils.utils import save_object
 
+# Import SMOTE and other necessary metrics
+from imblearn.over_sampling import SMOTE
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
@@ -37,6 +39,13 @@ class ModelTrainer:
             X_test, y_test = test_arr[:, :-1], test_arr[:, -1]
             
             logging.info("Data loaded and split successfully.")
+
+            # --- FIX: Apply SMOTE to the training data ---
+            logging.info("Applying SMOTE to handle class imbalance...")
+            smote = SMOTE(random_state=42)
+            X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
+            logging.info(f"Data shape after SMOTE: {X_train_resampled.shape}")
+            # --- End of Fix ---
             
             models = {
                 "Logistic Regression": LogisticRegression(),
@@ -55,13 +64,14 @@ class ModelTrainer:
                 model_name = list(models.keys())[i]
                 model = list(models.values())[i]
                 logging.info(f"Training {model_name} started")
-                model.fit(X_train, y_train)
+                # --- FIX: Train on the resampled data ---
+                model.fit(X_train_resampled, y_train_resampled)
                 logging.info(f"Training {model_name} completed")
-                y_pred_train = model.predict(X_train)
+                y_pred_train = model.predict(X_train_resampled)
                 y_pred_test = model.predict(X_test)
-                train_f1_score = f1_score(y_train, y_pred_train)
-                train_precision_score = precision_score(y_train, y_pred_train)
-                train_recall_score = recall_score(y_train, y_pred_train)
+                train_f1_score = f1_score(y_train_resampled, y_pred_train)
+                train_precision_score = precision_score(y_train_resampled, y_pred_train)
+                train_recall_score = recall_score(y_train_resampled, y_pred_train)
                 test_f1_score = f1_score(y_test, y_pred_test)
                 test_precision_score = precision_score(y_test, y_pred_test)
                 test_recall_score = recall_score(y_test, y_pred_test)
