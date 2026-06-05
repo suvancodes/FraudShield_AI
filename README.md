@@ -115,4 +115,8 @@ Open your browser and navigate to `http://localhost:8501`.
     -   Trains multiple classification models on the resampled data.
     -   Evaluates each model using the F1-score and identifies the best performer.
     -   Saves the best-performing model as `model.pkl`.
+<<<<<<< HEAD
 5.  **Prediction**: The Streamlit app loads the saved preprocessing object, Word2Vec model, and classifier model to make predictions on new, unseen user input.
+=======
+5.  **Prediction**: The Streamlit app loads the saved preprocessing object, Word2Vec model, and classifier model to make predictions on new, unseen user input.
+>>>>>>> 637890e9d5b0266b804c74bd61f32768a5e55db2
